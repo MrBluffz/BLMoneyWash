@@ -34,4 +34,4 @@ server_scripts {'Config.lua', '@es_extended/locale.lua', 'Locales/*.lua', 'Serve
 
 escrow_ignore {'Client/Client.lua', 'Server/Server_Open.lua', 'Locales/*.lua', 'Config.lua', 'WashKeyItem_SQL.sql', 'Readme.md', 'fxmanifest.lua'}
 
-dependencies {'es_extended', 'rprogress'}
+dependencies {'es_extended', 'rprogress', 'fivem-target'}
