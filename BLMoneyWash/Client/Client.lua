@@ -1,13 +1,13 @@
 local ESX
 local playerData
 math.randomseed(GetGameTimer())
-local unProcessedMoneySheets = unProcessedMoneySheets or 0
-local moneySheets = moneySheets or 0
-local cuttedMoney = cuttedMoney or 0
-local isProducingSheets = false
-local isCountingMoney = false
-local producingTime = math.random(Config.ProducingTime.min, Config.ProducingTime.max)
-local countingTime = math.random(Config.CountingTime.min, Config.CountingTime.max)
+unProcessedMoneySheets = unProcessedMoneySheets or 0
+moneySheets = moneySheets or 0
+cuttedMoney = cuttedMoney or 0
+isProducingSheets = false
+isCountingMoney = false
+producingTime = math.random(Config.ProducingTime.min, Config.ProducingTime.max)
+countingTime = math.random(Config.CountingTime.min, Config.CountingTime.max)
 
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(j)
@@ -88,7 +88,7 @@ setupProcessing = function()
 					options = {
 						{
 							name = k,
-							label = "Open",
+							label = v.label,
 						},
 					},
 				})
@@ -128,12 +128,11 @@ processingInteract = function(targetName, optionName, vars, entityHit)
 	if optionName == 'start' then
 		ESX.TriggerServerCallback('BLMoneyWash:getBlackMoneyAmount', function(amount)
 			if amount > (10000 - unProcessedMoneySheets) then amount = (10000 - unProcessedMoneySheets) end
-			if amount <= 0 then
+			if amount == 0 then ESX.ShowNotification("You don't have any money to load.") goto theend end
+			if amount > 0 then
 				if unProcessedMoneySheets < 10000 and moneySheets < 10000 then
 					TaskStartScenarioInPlace(playerPed, 'PROP_HUMAN_BUM_BIN', 0, true)
-					print('start')
 					exports.rprogress:Start("Loading up machine...", Config.WaitingTime)
-					print('end')
 					unProcessedMoneySheets = unProcessedMoneySheets + amount
 					TriggerServerEvent('BLMoneyWash:removeBlackMoney', amount)
 					startProducingTimer(amount)
@@ -142,8 +141,9 @@ processingInteract = function(targetName, optionName, vars, entityHit)
 					ESX.ShowNotification('The machine is fully loaded...')
 				end
 			else
-				ESX.ShowNotification("This machine can't hold anymore money! It's already over $10,000")
+				ESX.ShowNotification("You don't have any money to load.")
 			end
+			::theend::
 		end)
 	elseif optionName == 'counter' then
 		if cuttedMoney > 0 then
@@ -185,24 +185,24 @@ startProducingTimer = function(amount)
 end
 
 startCountingTimer = function(amount)
- if not isCountingMoney then
-  isCountingMoney = true
-  Citizen.CreateThread(function()
-   while isCountingMoney do
-    countingTime = countingTime - 1
-    if countingTime <= 0 then
-     countingTime = 0
-     cuttedMoney = cuttedMoney - amount
-     TriggerServerEvent('BLMoneyWash:giveCleanMoney', amount)
-     countingTime = countingTime + math.random(Config.CountingTime.min, Config.CountingTime.max)
-     isCountingMoney = false
-    end
-    Citizen.Wait(1000)
-   end
-  end)
- else
-  ESX.ShowNotification("Counting already under way! Wait until it's done.")
- end
+	if not isCountingMoney then
+		isCountingMoney = true
+		Citizen.CreateThread(function()
+			while isCountingMoney do
+				countingTime = countingTime - 1
+				if countingTime <= 0 then
+					countingTime = 0
+					cuttedMoney = cuttedMoney - amount
+					TriggerServerEvent('BLMoneyWash:giveCleanMoney', amount)
+					countingTime = countingTime + math.random(Config.CountingTime.min, Config.CountingTime.max)
+					isCountingMoney = false
+				end
+				Citizen.Wait(1000)
+			end
+		end)
+	else
+		ESX.ShowNotification("Counting already under way! Wait until it's done.")
+	end
 end
 
 function getClosestProcess(pos)
@@ -239,7 +239,11 @@ end
 
 Citizen.CreateThread(function()
 	setupEsx()
+	Wait(1000)
 	setupProcessing()
+	Wait(1000)
+	setupEntryway()
+	Wait(1000)
 	while true do
 		local ped = PlayerPedId()
 		local pos = GetEntityCoords(ped)
