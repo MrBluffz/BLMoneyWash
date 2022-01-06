@@ -30,7 +30,7 @@ Config.CountingTime = {
 	min = 10,
 	max = 20,
 } -- IN SECONDS, NOT MS (!)
-Config.RequireKey = false -- [ true | false ] set to true to require washkey item set below, set to false to not require any item.
+Config.RequireKey = true -- [ true | false ] set to true to require washkey item set below, set to false to not require any item.
 Config.WashKey = 'washkey'
 
 Config.Locations = {
@@ -39,10 +39,10 @@ Config.Locations = {
 		label = 'Washing Lab',
 		enter = vector3(818.69, -2365.04, 30.15),
 		exit = vector3(1138.13, -3199.07, -39.67),
---  JobRequired = { -- Delete this table completely if you do not want to restrict this location to a specific job type.
---			['gang'] = true,
---			['police'] = true,
---		},
+  JobRequired = { -- Delete this table completely if you do not want to restrict this location to a specific job type.
+			['gang'] = true,
+			['police'] = true,
+		},
 		process = {
 			start = {
 				pos = vector3(1133.29, -3198.39, -39.671),
