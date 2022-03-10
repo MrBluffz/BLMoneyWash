@@ -174,6 +174,7 @@ startProducingTimer = function(amount)
 					producingTime = 0
 					moneySheets = moneySheets + amount
 					producingTime = producingTime + math.random(Config.ProducingTime.min, Config.ProducingTime.max)
+     unProcessedMoneySheets = unProcessedMoneySheets - amount
 					isProducingSheets = false
 				end
 				Citizen.Wait(1000)
@@ -239,7 +240,7 @@ end
 
 Citizen.CreateThread(function()
 	setupEsx()
-	Wait(1000)
+	Wait(5000)
 	setupProcessing()
 	Wait(1000)
 	setupEntryway()
